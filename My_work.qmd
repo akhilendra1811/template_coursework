@@ -36,6 +36,9 @@ include_solutions <- TRUE
 require(rmarkdown)
 require(knitr)
 require(kableExtra)
+require(dplyr)
+require(palmerpenguins)
+require(ggplot2)
 # Put any library imports and other preamble here.
 ```
 
@@ -48,6 +51,49 @@ Please note:
 - bookdown syntax to referencing literate and provide a bib file;
 - kable syntax to build clean and clear tables that can be referenced;
 - Rmarkdown inline functions to collect and print all code used.
+
+# This section I will work on the penguin dataset
+
+
+
+```{r}
+#| echo: false
+plot(x = penguins$bill_length_mm, 
+     y = penguins$bill_depth_mm)
+```
+
+```{r}
+#| results: hold
+mean(penguins$body_mass_g, na.rm = TRUE)
+median(penguins$body_mass_g, na.rm = TRUE)
+```
+
+
+This is a table with count of penguins per species
+
+```{r}
+#| warning: false
+species_counts <- table(penguins$species)
+knitr::kable(species_counts, col.names = c("Species", "Count"))
+```
+
+
+```{r}
+#| label: fig-box-plot
+#| echo: false
+
+plot(x = penguins$species, 
+     y = penguins$body_mass_g, 
+     ylab = "Body mass (g)", 
+     xlab = "Species",
+     col = c(6,3,4))
+abline(h = mean(penguins$body_mass_g, na.rm = TRUE), col = 2, lwd = 2)
+```
+
+This @fig-box-plot is a box plot for the species and their body mass, the red line is the average weight of all the penguins.
+
+
+
 
 # This section will have a table
 

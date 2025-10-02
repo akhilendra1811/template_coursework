@@ -10,6 +10,7 @@ format:
     df-print: paged
   pdf: default
 format-links: false
+csl: "https://www.zotero.org/styles/harvard-imperial-college-london"
 bibliography: "My_work.bib" 
 ---
 
@@ -72,10 +73,16 @@ median(penguins$body_mass_g, na.rm = TRUE)
 This is a table with count of penguins per species
 
 ```{r}
+#| label: tbl-species-counts
+#| tbl-cap: "Penguin species counts"
 #| warning: false
+
 species_counts <- table(penguins$species)
 knitr::kable(species_counts, col.names = c("Species", "Count"))
 ```
+
+As shown in @tbl-species-counts, the Adelie penguin is the most common species in the dataset.
+
 
 
 ```{r}
@@ -94,36 +101,91 @@ This @fig-box-plot is a box plot for the species and their body mass, the red li
 
 
 
+```{r}
+#| echo: false
+penguins <- palmerpenguins::penguins
+
+# Add a column marking rows with missing values
+penguins$has_missing <- apply(is.na(penguins), 1, any)
+
+
+penguin_summary <- penguins %>%
+  group_by(species) %>%
+  summarise(
+    avg_bill_length = mean(bill_length_mm, na.rm = TRUE),
+    avg_flipper_length = mean(flipper_length_mm, na.rm = TRUE)
+  )
+```
+
+```{r}
+#| label: fig-penguins
+#| echo: false
+#| warning: false
+#| fig-cap: "Penguin body measurements"
+#| layout-ncol: 2
+#| fig-subcap: ["Flipper length vs. body mass", "Body mass by species"]
+
+# --- First plot (ggplot) ---
+ggplot(penguins, aes(x = flipper_length_mm, 
+                     y = body_mass_g, 
+                     color = species, 
+                     shape = species)) +
+  geom_point(size = 3) +
+  labs(
+    x = "Flipper Length (mm)",
+    y = "Body Mass (g)"
+  ) +
+  theme_minimal()
+
+# --- Second plot (base R) ---
+plot(x = penguins$species, 
+     y = penguins$body_mass_g, 
+     ylab = "Body mass (g)", 
+     xlab = "Species",
+     col = c(6,3,4))
+abline(h = mean(penguins$body_mass_g, na.rm = TRUE), col = 2, lwd = 2)
+```
+
+
+As shown in @fig-penguins, penguin body measurements vary across species.  
+Specifically, @fig-penguins-1 highlights the relationship between flipper length and body mass,  
+while @fig-penguins-2 compares body mass across species with a reference line for the mean.
+
+
+This paper got me through my dissertation @vaswani2023attentionneed.
+
 
 # This section will have a table
 
 In this question we seek to generate samples from the standard Cauchy distribution, with pdf given by
-\begin{equation}
-  p(x) = \frac{1}{\pi (1 + x^2)}, \quad x \in \mathbb{R}.
-  (\#eq:1)
-\end{equation}
-The cdf associated with \@ref(eq:1) is given by
-\begin{equation}
-  F(x) = \frac{1}{\pi}\arctan(x) + \frac{1}{2}.
-  (\#eq:2)
-\end{equation}
 
-**Part a.**  We apply the inversion method as described by @graham2013stochastic. We first compute the generalised inverse of the cdf \@ref(eq:2).  To this end, let $y\in [0,1]$, then
+$$
+p(x) = \frac{1}{\pi (1 + x^2)}, \quad x \in \mathbb{R}.
+$$ {#eq-cauchy-pdf}
+
+The cdf associated with @eq-cauchy-pdf is given by
+
+$$
+F(x) = \frac{1}{\pi}\arctan(x) + \frac{1}{2}.
+$$ {#eq-cauchy-cdf}
+
+
+**Part a.**  We apply the inversion method as described by @graham2013stochastic. We first compute the generalised inverse of the cdf @eq-cauchy-cdf.  To this end, let $y\in [0,1]$, then
 
 \begin{align}
-    y &= F(x), \quad \iff (\#eq:3a) \\
+    y &= F(x), \quad \iff \label{eq-inversion-step1} \\
     y &= \frac{1}{\pi}\arctan(x) + \frac{1}{2} \quad \iff \\
-    y-\frac{1}{2}  &= \frac{1}{\pi}\arctan(x)  \quad \iff \\
-    \pi\left(y-\frac{1}{2}\right)  &= \arctan(x)  \quad \iff \\
-    x &= \tan\left(\pi\left(y-\frac{1}{2}\right)\right). 
+    y - \tfrac{1}{2} &= \tfrac{1}{\pi}\arctan(x)  \quad \iff \\
+    \pi\!\left(y-\tfrac{1}{2}\right) &= \arctan(x)  \quad \iff \\
+    x &= \tan\!\left(\pi\!\left(y-\tfrac{1}{2}\right)\right). 
 \end{align}
 
-By the inversion method [@graham2013stochastic], if $Y \sim U[0,1]$, then 
 
-\begin{equation}
-  X = \tan\left(\pi\left(Y-\frac{1}{2}\right)\right),
-  (\#eq:4)
-\end{equation}
+By the inversion method [@graham2013stochastic], if $Y \sim U[0,1]$, then
+
+$$
+X = \tan\!\left(\pi\!\left(Y - \tfrac{1}{2}\right)\right).
+$$ {#eq-inversion}
 
 
 ```{r, echo=FALSE}
